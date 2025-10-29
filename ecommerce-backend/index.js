@@ -1,30 +1,25 @@
 import express from "express";
 import cors from "cors";
-import pkg from "pg";
 import dotenv from "dotenv";
+import productsRoute from "./routes/products.js";
 
 dotenv.config();
-const { Pool } = pkg;
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// PostgreSQL connection
-const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+// Routes
+app.use("/api/products", productsRoute);
+
+// Default route
+app.get("/", (req, res) => {
+  res.send("E-commerce backend is running 🚀");
 });
 
-// Simple API route
-app.get("/api/products", async (req, res) => {
-  const result = await pool.query("SELECT * FROM products");
-  res.json(result.rows);
-});
-
+// Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Backend server running on port ${PORT}`);
+});
 
