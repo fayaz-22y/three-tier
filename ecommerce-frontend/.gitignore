@@ -1,4 +1,8 @@
 node_modules/
-pgdata/
 .env
+build/
+dist/
+.cache/
+tmp/
 *.log
+

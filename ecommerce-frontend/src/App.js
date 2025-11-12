@@ -1,40 +1,30 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import ProductList from "./components/ProductList";
 
 function App() {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    // Use backend container name inside Docker, or public IP when deployed
-    const backendURL =
-      process.env.REACT_APP_API_URL || "http://localhost:5000/api/products";
-
-    axios
-      .get(backendURL)
-      .then((res) => setProducts(res.data))
-      .catch((err) => console.error("Error fetching products:", err));
-  }, []);
-
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>🛍️ My E-commerce Store</h1>
-      <div style={{ display: "flex", flexWrap: "wrap" }}>
-        {products.map((p) => (
-          <div
-            key={p.id}
-            style={{
-              margin: "10px",
-              border: "1px solid #ccc",
-              padding: "10px",
-              width: "200px",
-            }}
-          >
-            <img src={p.image} alt={p.name} width="150" />
-            <h3>{p.name}</h3>
-            <p>${p.price}</p>
-          </div>
-        ))}
-      </div>
+    <div>
+      <nav className="navbar navbar-dark bg-dark">
+        <div className="container">
+          <a className="navbar-brand" href="#">
+            🛍️ Flozz Store
+          </a>
+        </div>
+      </nav>
+
+      <header className="bg-light text-center py-4 shadow-sm">
+        <h2>Welcome to Flozz — Step into Style 👟</h2>
+        <p>Discover premium sneakers crafted for comfort and performance.</p>
+      </header>
+
+      <main className="container my-5">
+        <ProductList />
+      </main>
+
+      <footer className="bg-dark text-light text-center py-3 mt-auto">
+        © 2025 Flozz Footwear | Designed with ❤️
+      </footer>
     </div>
   );
 }
