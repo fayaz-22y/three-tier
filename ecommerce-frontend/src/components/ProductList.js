@@ -6,14 +6,13 @@ const ProductList = () => {
 
   useEffect(() => {
     axios
-      .get("http://43.205.135.190:5000/api/products") // ✅ Backend API endpoint
+      .get("http://107.22.130.95:5000/api/products") // ✅ Backend API endpoint
       .then((res) => setProducts(res.data))
       .catch((err) => console.error("Error fetching products:", err));
   }, []);
 
   const handleImageError = (e) => {
     e.target.onerror = null; // Prevent infinite loop
-    e.target.src = "/placeholder.jpg"; // Fallback image from /public
   };
 
   return (

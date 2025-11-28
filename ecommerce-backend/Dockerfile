@@ -10,8 +10,12 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy rest of the app
+# Copy all source code
 COPY . .
+
+# Make sure uploads folder exists inside container
+RUN mkdir -p /app/uploads
+COPY uploads /app/uploads
 
 # Expose backend port
 EXPOSE 5000

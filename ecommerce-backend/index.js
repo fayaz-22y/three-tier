@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import productsRoute from "./routes/products.js";
+import products from "./routes/products.js";
 
 dotenv.config();
 
@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/api/products", productsRoute);
+app.use("/api/products", products);
 
 // Default route
 app.get("/", (req, res) => {
