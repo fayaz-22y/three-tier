@@ -1,31 +1,30 @@
-import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import ProductList from "./components/ProductList";
+import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Products from "./pages/Products";
+import Cart from "./pages/Cart";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import ProductDetail from "./pages/ProductDetail";
 
 function App() {
   return (
-    <div>
-      <nav className="navbar navbar-dark bg-dark">
-        <div className="container">
-          <a className="navbar-brand" href="#">
-            🛍️ Flozz Store
-          </a>
-        </div>
-      </nav>
+    <Router>
+      <Navbar />
 
-      <header className="bg-light text-center py-4 shadow-sm">
-        <h2>Welcome to Flozz — Step into Style 👟</h2>
-        <p>Discover premium sneakers crafted for comfort and performance.</p>
-      </header>
-
-      <main className="container my-5">
-        <ProductList />
-      </main>
-
-      <footer className="bg-dark text-light text-center py-3 mt-auto">
-        © 2025 Flozz Footwear | Designed with ❤️
-      </footer>
-    </div>
+      <div className="container">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

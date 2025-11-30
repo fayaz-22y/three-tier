@@ -7,7 +7,9 @@ services:
     ports:
       - "3000:80"
     environment:
-      - REACT_APP_API_URL=http://107.22.130.95:5000/api/products
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+    volumes:
+      - ./ecommerce-frontend/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - backend
     restart: always

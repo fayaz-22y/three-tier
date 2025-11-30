@@ -1,0 +1,271 @@
+/* ----------------- GLOBAL ----------------- */
+
+body {
+  background: #f7f8fa;
+  font-family: "Inter", sans-serif;
+}
+
+/* ----------------- NAVBAR ----------------- */
+.custom-navbar {
+  background: white !important;
+  padding: 15px 0;
+}
+
+.brand-text {
+  font-weight: 800;
+  font-size: 28px;
+  color: #111 !important;
+}
+
+.nav-link {
+  font-size: 16px;
+  margin-right: 20px;
+  color: #333 !important;
+}
+
+.nav-link:hover {
+  color: #007bff !important;
+}
+
+.login-btn {
+  padding: 8px 18px;
+  border-radius: 12px;
+  background: #007bff;
+  color: white;
+}
+
+.login-btn:hover {
+  background: #0056d2;
+}
+
+/* ----------------- PRODUCT GRID ----------------- */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 25px;
+  padding: 30px;
+}
+
+/* ----------------- PRODUCT CARD ----------------- */
+
+.modern-card {
+  background: white;
+  padding: 18px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+.modern-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+}
+
+.modern-card-img {
+  width: 100%;
+  height: 230px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.modern-card-title {
+  margin-top: 12px;
+  font-weight: 600;
+  color: #222;
+}
+
+.modern-card-price {
+  color: #007bff;
+  font-size: 20px;
+  margin: 5px 0;
+}
+
+.modern-view-btn {
+  background: #111;
+  color: white;
+  padding: 8px 22px;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
+.modern-view-btn:hover {
+  background: #333;
+}
+
+/* ----------------- PRODUCT DETAIL PAGE ----------------- */
+
+.product-detail-container {
+  display: flex;
+  gap: 40px;
+  padding: 40px 80px;
+}
+
+.product-detail-left {
+  max-width: 450px;
+}
+
+.product-detail-img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.product-detail-right {
+  width: 55%;
+}
+
+.pd-price {
+  font-size: 28px;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.pd-desc {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #444;
+}
+
+.add-cart-btn {
+  margin-top: 35px;
+  padding: 14px 25px;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+}
+
+.add-cart-btn:hover {
+  background-color: #333;
+}
+
+/* ----------------- RESPONSIVE ----------------- */
+
+@media (max-width: 900px) {
+  .product-detail-container {
+    flex-direction: column;
+  }
+
+  .product-detail-right {
+    width: 100%;
+  }
+}
+
+/* ----------------- HOME PAGE ----------------- */
+
+.home-container {
+  width: 100%;
+  padding: 0;
+}
+
+/* HERO SECTION */
+.hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 80px;
+  background: #ffffff;
+  gap: 40px;
+}
+
+.hero-text {
+  flex: 1;
+}
+
+.hero-title {
+  font-size: 48px;
+  font-weight: 800;
+  color: #111;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  margin-top: 12px;
+  color: #555;
+  max-width: 450px;
+}
+
+.hero-btn {
+  display: inline-block;
+  margin-top: 25px;
+  padding: 12px 28px;
+  background: #007bff;
+  color: white;
+  border-radius: 12px;
+  font-size: 18px;
+  text-decoration: none;
+}
+
+.hero-btn:hover {
+  background: #0056d2;
+}
+
+.hero-image img {
+  width: 450px;
+  height: 380px;
+  border-radius: 18px;
+  object-fit: cover;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+/* FEATURED SECTION */
+.featured-section {
+  padding: 40px 80px;
+  text-align: center;
+}
+
+.featured-section h2 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 25px;
+}
+
+.featured-card {
+  background: white;
+  padding: 14px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+.featured-card:hover {
+  transform: translateY(-4px);
+}
+
+.featured-card img {
+  width: 100%;
+  height: 180px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.featured-card h4 {
+  margin-top: 12px;
+  color: #111;
+  font-weight: 600;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 900px) {
+  .hero-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .hero-image img {
+    width: 100%;
+    height: auto;
+  }
+}
+

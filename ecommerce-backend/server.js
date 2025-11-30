@@ -1,24 +1,23 @@
 import express from "express";
+import cors from "cors";
+import productRoutes from "./routes/products.js";
+import authRoutes from "./routes/authRoutes.js";
 import path from "path";
 import { fileURLToPath } from "url";
-import cors from "cors";
 
-// ✔️ FIXED ROUTE
-import products from "./routes/products.js";
+const app = express();
+app.use(cors());
+app.use(express.json());
 
+// Fix __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
-app.use(express.json());
-app.use(cors());
-
+// ✅ Serve uploaded images correctly
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ✔️ USE THE CORRECT ROUTE
-app.use("/api/products", products);
+app.use("/api/products", productRoutes);
+app.use("/api/auth", authRoutes);
 
-const PORT = 5000;
-app.listen(PORT, "0.0.0.0", () => console.log("server running"));
-
+app.listen(5000, () => console.log("Backend running on 5000"));
 
