@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import "./../style.css";
+import { CartContext } from "../context/CartContext";
 
 function Navbar() {
+  const { totalQty } = useContext(CartContext);
+
   return (
     <nav className="navbar navbar-expand-lg custom-navbar shadow-sm">
       <div className="container">
@@ -30,13 +33,13 @@ function Navbar() {
               <Link className="nav-link" to="/about">About</Link>
             </li>
 
-            <li className="nav-item">
-              <Link className="nav-link" to="/contact">Contact</Link>
-            </li>
-
+            {/* CART ICON WITH BADGE */}
             <li className="nav-item cart-icon">
-              <Link className="nav-link" to="/cart">
+              <Link className="nav-link cart-link" to="/cart">
                 🛒 Cart
+                {totalQty > 0 && (
+                  <span className="cart-badge">{totalQty}</span>
+                )}
               </Link>
             </li>
 
@@ -49,5 +52,4 @@ function Navbar() {
 }
 
 export default Navbar;
-
 

@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { CartContext } from "../context/CartContext";
+import "./../style.css";
 
 function ProductCard({ product }) {
+  const { addToCart } = useContext(CartContext);
+
   return (
-    <div className="modern-card">
+    <div className="modern-card fade-in">
       <img
         src={`${process.env.REACT_APP_API_URL}/uploads/${product.image?.trim()}`}
         alt={product.name}
@@ -16,6 +20,10 @@ function ProductCard({ product }) {
       <Link to={`/product/${product.id}`} className="btn modern-view-btn">
         View Product
       </Link>
+
+      <button className="btn modern-add-btn" onClick={() => addToCart(product)}>
+        Add to Cart
+      </button>
     </div>
   );
 }
