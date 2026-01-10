@@ -20,7 +20,7 @@ function ProductDetail() {
     <div className="product-detail-container">
       <div className="product-detail-left">
         <img
-          src={`${process.env.REACT_APP_API_URL}/uploads/${product.image_url || product.image?.trim()}`}
+          src={`${process.env.REACT_APP_API_URL}${product.image_url || product.image?.trim()}`}
           alt={product.name}
           className="product-detail-img"
         />

@@ -20,14 +20,9 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./ecommerce-backend/uploads:/app/uploads   # <-- IMPORTANT FIX
-    environment:
-      - PORT=5000
-      - PGHOST=postgres
-      - PGUSER=ecommerce_user
-      - PGPASSWORD=mousin
-      - PGDATABASE=ecommerce
-      - PGPORT=5432
+      - ./ecommerce-backend/uploads:/app/uploads
+    env_file:
+      - ./ecommerce-backend/.env
     depends_on:
       - postgres
     restart: always

@@ -1,17 +1,15 @@
-// db.js
-import pg from "pg";
+import pkg from "pg";
 import dotenv from "dotenv";
+
 dotenv.config();
+const { Pool } = pkg;
 
-const { Pool } = pg;
-
-// Database connection pool
 const pool = new Pool({
-  host: process.env.PGHOST || "localhost",
-  user: process.env.PGUSER || "ecommerce_user",
-  password: process.env.PGPASSWORD || "mousin",
-  database: process.env.PGDATABASE || "ecommerce",
-  port: process.env.PGPORT || 5432,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 export default pool;

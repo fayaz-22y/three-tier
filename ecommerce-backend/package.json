@@ -5,7 +5,7 @@
   "description": "Backend for E-commerce app using Node.js, Express, and PostgreSQL",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node index.js",
     "dev": "nodemon index.js"
   },
   "keywords": [],
