@@ -8,7 +8,7 @@ function Products() {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_API_URL}/api/products`)
+      .get(`/api/products`)
       .then((res) => setProducts(res.data))
       .catch((err) => console.log("Error loading products:", err));
   }, []);

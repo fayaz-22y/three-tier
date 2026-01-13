@@ -6,13 +6,8 @@ import "./../style.css";
 function ProductCard({ product }) {
   const { addToCart } = useContext(CartContext);
 
-  // 🔒 Build image URL safely
-  // Backend sends: image_url = "cat.jpg"  OR  "/uploads/cat.jpg"
-  const imageSrc = product.image_url
-    ? product.image_url.startsWith("/uploads")
-      ? `${process.env.REACT_APP_API_URL}${product.image_url}`
-      : `${process.env.REACT_APP_API_URL}/uploads/${product.image_url}`
-    : "/no-image.png";
+  // Backend already sends: /uploads/filename.jpg
+  const imageSrc = product.image_url || "/no-image.png";
 
   return (
     <div className="modern-card fade-in">

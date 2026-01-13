@@ -1,51 +1,94 @@
 import express from "express";
 import pool from "../db.js";
+import jwt from "jsonwebtoken";
+import multer from "multer";
 
 const router = express.Router();
 
-// GET ALL PRODUCTS
-router.get("/", async (req, res) => {
+/* ========== AUTH MIDDLEWARE (Retailer only) ========== */
+function authRetailer(req, res, next) {
+  const auth = req.headers.authorization;
+  if (!auth) return res.status(401).json({ message: "No token" });
+
+  const token = auth.split(" ")[1];
   try {
-    const result = await pool.query("SELECT * FROM products");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // 🔒 Sanitize image_url (production-safe)
-    const cleanedProducts = result.rows.map(product => ({
-      ...product,
-      image_url: product.image_url
-        ? product.image_url.trim()
-        : null,
-    }));
+    if (decoded.role !== "retailer") {
+      return res.status(403).json({ message: "Only retailers allowed" });
+    }
 
-    res.json(cleanedProducts);
-  } catch (err) {
-    console.error("ERROR FETCHING PRODUCTS:", err);
-    res.status(500).json({ error: "Failed to fetch products" });
+    req.user = decoded;
+    next();
+  } catch {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+}
+
+/* ========== FILE UPLOAD ========== */
+const storage = multer.diskStorage({
+  destination: "uploads/",
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
   }
 });
 
-// GET SINGLE PRODUCT
+const upload = multer({ storage });
+
+/* ========== GET ALL PRODUCTS (Customer Shop) ========== */
+router.get("/", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT p.*, u.name AS retailer_name
+      FROM products p
+      JOIN users u ON p.retailer_id = u.id
+    `);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch products" });
+  }
+});
+
+/* ========== ADD PRODUCT (Retailer) ========== */
+router.post("/", authRetailer, upload.single("image"), async (req, res) => {
+  try {
+    const { name, price, description } = req.body;
+    const image_url = `/uploads/${req.file.filename}`;
+
+    await pool.query(
+      "INSERT INTO products (name, price, description, image_url, retailer_id) VALUES ($1,$2,$3,$4,$5)",
+      [name, price, description, image_url, req.user.id]
+    );
+
+    res.json({ message: "Product added successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to add product" });
+  }
+});
+// GET ONE PRODUCT BY ID
 router.get("/:id", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM products WHERE id = $1",
+      `
+      SELECT p.*, u.name AS retailer_name
+      FROM products p
+      JOIN users u ON p.retailer_id = u.id
+      WHERE p.id = $1
+      `,
       [req.params.id]
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({ message: "Product not found" });
     }
 
-    const product = result.rows[0];
-
-    // 🔒 Sanitize image_url
-    product.image_url = product.image_url
-      ? product.image_url.trim()
-      : null;
-
-    res.json(product);
+    res.json(result.rows[0]);
   } catch (err) {
-    console.error("ERROR FETCHING PRODUCT:", err);
-    res.status(500).json({ error: "Failed to fetch product" });
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch product" });
   }
 });
 

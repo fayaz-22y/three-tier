@@ -8,7 +8,7 @@ const router = express.Router();
 // Signup
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields required" });
@@ -17,8 +17,8 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, email",
-      [name, email, hashedPassword]
+      "INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, email",
+      [name, email, hashedPassword, role || "customer"]
     );
 
     res.status(201).json({
@@ -62,7 +62,7 @@ router.post("/login", async (req, res) => {
     console.log("JWT SECRET:", process.env.JWT_SECRET);
 
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );

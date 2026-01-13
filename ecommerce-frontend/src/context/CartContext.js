@@ -52,9 +52,22 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  // 🔥 THIS WAS MISSING — this fixes checkout
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem("cart");
+  };
+
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, increaseQty, decreaseQty }}
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        increaseQty,
+        decreaseQty,
+        clearCart,
+      }}
     >
       {children}
     </CartContext.Provider>
