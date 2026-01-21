@@ -6,39 +6,40 @@ import "./../style.css";
 
 function ProductDetail() {
   const { id } = useParams();
-  const [product, setProduct] = useState(null);
   const { addToCart } = useContext(CartContext);
+  const [product, setProduct] = useState(null);
 
   useEffect(() => {
-    axios
-      .get(`/api/products/${id}`)
-      .then((res) => setProduct(res.data))
-      .catch((err) => console.log("Error loading product:", err));
+    axios.get(`/api/products/${id}`)
+      .then(res => setProduct(res.data))
+      .catch(err => console.error(err));
   }, [id]);
 
-  if (!product) return <h2 style={{ textAlign: "center" }}>Loading...</h2>;
+  if (!product) {
+    return <p className="centered">Loading...</p>;
+  }
 
   return (
-    <div className="product-detail-container">
-      <div className="product-detail-left">
-        <img
-          src={product.image_url}
-          alt={product.name}
-          className="product-detail-img"
-        />
-      </div>
+    <div className="product-detail-page">
+      <div className="product-detail-card">
 
-      <div className="product-detail-right">
-        <h1>{product.name}</h1>
-        <p className="pd-price">₹{product.price}</p>
-        <p className="pd-desc">{product.description}</p>
+        <div className="product-detail-image">
+          <img src={product.image_url} alt={product.name} />
+        </div>
 
-        <button
-          className="add-cart-btn"
-          onClick={() => addToCart(product)}
-        >
-          Add to Cart
-        </button>
+        <div className="product-detail-info">
+          <h1>{product.name}</h1>
+          <p className="pd-price">₹{product.price}</p>
+          <p className="pd-desc">{product.description}</p>
+
+          <button
+            className="btn-primary"
+            onClick={() => addToCart(product)}
+          >
+            Add to Cart
+          </button>
+        </div>
+
       </div>
     </div>
   );

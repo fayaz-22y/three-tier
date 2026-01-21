@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 export const CartContext = createContext();
@@ -9,15 +9,18 @@ export const CartProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : [];
   });
 
+  // Persist cart to localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
+  /* ================= ADD TO CART ================= */
   const addToCart = (product) => {
     setCart((prev) => {
       const exists = prev.find((item) => item.id === product.id);
 
       if (exists) {
+        toast.info("Quantity increased");
         return prev.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
@@ -25,34 +28,37 @@ export const CartProvider = ({ children }) => {
         );
       }
 
-      toast.success("Added to cart!");
+      toast.success("Added to cart");
       return [...prev, { ...product, quantity: 1 }];
     });
   };
 
-  const removeFromCart = (id) => {
-    setCart(cart.filter((item) => item.id !== id));
-  };
-
+  /* ================= QUANTITY ================= */
   const increaseQty = (id) => {
-    setCart(
-      cart.map((item) =>
+    setCart((prev) =>
+      prev.map((item) =>
         item.id === id ? { ...item, quantity: item.quantity + 1 } : item
       )
     );
   };
 
   const decreaseQty = (id) => {
-    setCart(
-      cart.map((item) =>
-        item.id === id && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
+    setCart((prev) =>
+      prev
+        .map((item) =>
+          item.id === id
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
     );
   };
 
-  // 🔥 THIS WAS MISSING — this fixes checkout
+  /* ================= REMOVE / CLEAR ================= */
+  const removeFromCart = (id) => {
+    setCart((prev) => prev.filter((item) => item.id !== id));
+  };
+
   const clearCart = () => {
     setCart([]);
     localStorage.removeItem("cart");
@@ -63,9 +69,9 @@ export const CartProvider = ({ children }) => {
       value={{
         cart,
         addToCart,
-        removeFromCart,
         increaseQty,
         decreaseQty,
+        removeFromCart,
         clearCart,
       }}
     >

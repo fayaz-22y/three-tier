@@ -18,12 +18,12 @@ function auth(req, res, next) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ message: "Invalid token" });
   }
 }
 
-/* ================= PLACE ORDER ================= */
+/* ================= PLACE ORDER (CUSTOMER) ================= */
 router.post("/", auth, async (req, res) => {
   try {
     const { cart } = req.body;
@@ -34,7 +34,7 @@ router.post("/", auth, async (req, res) => {
 
     let total = 0;
     cart.forEach((item) => {
-      total += item.price * item.quantity;
+      total += Number(item.price) * item.quantity;
     });
 
     const orderResult = await pool.query(
@@ -51,14 +51,13 @@ router.post("/", auth, async (req, res) => {
       );
     }
 
-    return res.status(201).json({
+    res.status(201).json({
       message: "Order placed successfully",
-      orderId
+      orderId,
     });
-
   } catch (err) {
     console.error("ORDER ERROR:", err);
-    return res.status(500).json({ message: "Order failed" });
+    res.status(500).json({ message: "Order failed" });
   }
 });
 
@@ -66,14 +65,121 @@ router.post("/", auth, async (req, res) => {
 router.get("/my", auth, async (req, res) => {
   try {
     const orders = await pool.query(
-      "SELECT * FROM orders WHERE customer_id = $1 ORDER BY created_at DESC",
+      `
+      SELECT
+        o.id,
+        o.total,
+        o.created_at,
+        json_agg(
+          json_build_object(
+            'name', p.name,
+            'price', oi.price,
+            'quantity', oi.quantity,
+            'image_url', p.image_url
+          )
+        ) AS items
+      FROM orders o
+      JOIN order_items oi ON o.id = oi.order_id
+      JOIN products p ON oi.product_id = p.id
+      WHERE o.customer_id = $1
+      GROUP BY o.id
+      ORDER BY o.created_at DESC
+      `,
       [req.user.id]
     );
 
-    return res.json(orders.rows);
+    res.json(orders.rows);
   } catch (err) {
-    console.error("FETCH ORDERS ERROR:", err);
-    return res.status(500).json({ message: "Failed to fetch orders" });
+    console.error("CUSTOMER ORDERS ERROR:", err);
+    res.status(500).json({ message: "Failed to fetch orders" });
+  }
+});
+
+/* ================= RETAILER SALES SUMMARY ================= */
+router.get("/retailer", auth, async (req, res) => {
+  if (req.user.role !== "retailer") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        p.name,
+        SUM(oi.quantity) AS sold,
+        SUM(oi.price * oi.quantity) AS revenue
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.id
+      WHERE p.retailer_id = $1
+      GROUP BY p.name
+      `,
+      [req.user.id]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("RETAILER SALES ERROR:", err);
+    res.status(500).json({ message: "Failed to fetch sales data" });
+  }
+});
+
+/* ================= RETAILER ORDERS (DETAILED) ================= */
+router.get("/retailer/orders", auth, async (req, res) => {
+  if (req.user.role !== "retailer") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        o.id,
+        o.created_at,
+        o.total
+      FROM orders o
+      JOIN order_items oi ON o.id = oi.order_id
+      JOIN products p ON oi.product_id = p.id
+      WHERE p.retailer_id = $1
+      GROUP BY o.id
+      ORDER BY o.created_at DESC
+      `,
+      [req.user.id]
+    );
+
+    res.json(result.rows); // ALWAYS ARRAY
+  } catch (err) {
+    console.error("RETAILER ORDERS ERROR:", err);
+    res.status(500).json({ message: "Failed to fetch retailer orders" });
+  }
+});
+/* ================= ADMIN STATS ================= */
+router.get("/admin/stats", auth, async (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Admin only" });
+  }
+
+  try {
+    const usersCount = await pool.query(`
+      SELECT
+        COUNT(*) FILTER (WHERE role='customer') AS customers,
+        COUNT(*) FILTER (WHERE role='retailer') AS retailers
+      FROM users
+    `);
+
+    const ordersCount = await pool.query(`
+      SELECT COUNT(*) AS orders, COALESCE(SUM(total),0) AS revenue
+      FROM orders
+    `);
+
+    res.json({
+      customers: usersCount.rows[0].customers,
+      retailers: usersCount.rows[0].retailers,
+      orders: ordersCount.rows[0].orders,
+      revenue: ordersCount.rows[0].revenue
+    });
+  } catch (err) {
+    console.error("ADMIN STATS ERROR:", err);
+    res.status(500).json({ message: "Failed to fetch stats" });
   }
 });
 

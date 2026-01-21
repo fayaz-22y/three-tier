@@ -1,55 +1,62 @@
 import React, { useContext } from "react";
 import { CartContext } from "../context/CartContext";
+import "./../style.css";
 
 function Cart() {
-  const { cart, increaseQty, decreaseQty, removeFromCart, clearCart } =
-    useContext(CartContext);
+  const {
+    cart,
+    increaseQty,
+    decreaseQty,
+    removeFromCart,
+    clearCart,
+  } = useContext(CartContext);
 
   const total = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + Number(item.price) * item.quantity,
     0
   );
 
   const checkout = async () => {
-  try {
-    const res = await fetch("/api/orders", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-      body: JSON.stringify({ cart }),
-    });
+    if (cart.length === 0) return;
 
-    if (!res.ok) {
-      alert("Checkout failed");
-      return;
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ cart }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || "Checkout failed");
+        return;
+      }
+
+      clearCart();
+      alert("Order placed successfully!");
+    } catch {
+      alert("Server unreachable");
     }
-
-    clearCart();
-    alert("Order placed successfully!");
-  } catch (err) {
-    console.error("JS error:", err);
-    alert("Something went wrong in UI");
-  }
-};
-
-
-
+  };
 
   return (
-    <div className="cart-container fade-in">
+    <div className="cart-container">
       <h2>Your Cart</h2>
 
-      {cart.length === 0 && <p>Your cart is empty</p>}
+      {cart.length === 0 && (
+        <p className="text-muted">Your cart is empty</p>
+      )}
 
       {cart.map((item) => (
-        <div key={item.id} className="cart-item slide-in">
-          <img
-            src={item.image_url}
-            alt={item.name}
-            style={{ width: "80px", height: "80px", objectFit: "cover" }}
-          />
+        <div key={item.id} className="cart-item">
+          {/* IMAGE FIX — WRAPPED */}
+          <div className="cart-img-wrapper">
+            <img src={item.image_url} alt={item.name} />
+          </div>
 
           <div className="cart-details">
             <h4>{item.name}</h4>
@@ -72,7 +79,7 @@ function Cart() {
       ))}
 
       {cart.length > 0 && (
-        <div className="cart-total">
+        <div className="cart-summary">
           <h3>Total: ₹{total}</h3>
           <button className="checkout-btn" onClick={checkout}>
             Checkout

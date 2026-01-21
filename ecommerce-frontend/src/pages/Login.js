@@ -1,14 +1,23 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import "./../style.css";
 
 export default function Login({ role }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const loginUser = async () => {
+    if (!email || !password) {
+      alert("Please enter email and password");
+      return;
+    }
+
     try {
+      setLoading(true);
+
       const res = await axios.post("/api/auth/login", {
         email,
         password,
@@ -17,46 +26,61 @@ export default function Login({ role }) {
       const token = res.data.token;
       localStorage.setItem("token", token);
 
-      // Decode JWT to get role
+      // 🔔 Notify navbar immediately
+      window.dispatchEvent(new Event("authChanged"));
+
       const payload = JSON.parse(atob(token.split(".")[1]));
 
       if (payload.role === "retailer") {
         navigate("/retailer/dashboard");
+      } else if (payload.role === "admin") {
+        navigate("/admin/dashboard");
       } else {
         navigate("/products");
       }
-    } catch (err) {
-      alert("Invalid Email or Password");
+    } catch {
+      alert("Invalid email or password");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container mt-5 text-center">
-      <h2>{role === "retailer" ? "Retailer Login" : "Customer Login"}</h2>
+    <div className="login-page fade-in">
+      <h2 className="login-title">
+        {role === "retailer" ? "Retailer Login" : "Customer Login"}
+      </h2>
 
-      <input
-        placeholder="Email"
-        className="form-control mt-3"
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      <p className="login-subtitle">
+        {role === "retailer"
+          ? "Access your store and manage products"
+          : "Shop products and track your orders"}
+      </p>
 
-      <input
-        placeholder="Password"
-        className="form-control mt-3"
-        type="password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+      <div className="login-form">
+        <input
+          type="email"
+          placeholder="Email address"
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-      <button className="mt-3" onClick={loginUser}>
-        Login
-      </button>
+        <input
+          type="password"
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-      <p className="mt-3">
-        Don't have an account?{" "}
+        <button onClick={loginUser} disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </div>
+
+      <p className="login-footer">
+        Don’t have an account?{" "}
         {role === "retailer" ? (
-          <a href="/signup/retailer">Sign up as Retailer</a>
+          <Link to="/signup/retailer">Sign up as Retailer</Link>
         ) : (
-          <a href="/signup/customer">Sign up as Customer</a>
+          <Link to="/signup/customer">Sign up as Customer</Link>
         )}
       </p>
     </div>

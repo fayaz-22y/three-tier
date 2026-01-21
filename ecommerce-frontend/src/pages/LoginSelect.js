@@ -4,24 +4,24 @@ import "./../style.css";
 function LoginSelect() {
   return (
     <div className="login-select-container fade-in">
-      <h1 className="login-select-title slide-up">Choose Your Login</h1>
-      <p className="login-select-sub slide-up-delayed">
-        Select how you want to access your account
+      <h1 className="login-select-title">Welcome Back</h1>
+      <p className="login-select-sub">
+        Choose how you want to access the platform
       </p>
 
       <div className="login-card-box">
 
-        {/* CUSTOMER LOGIN */}
-        <Link to="/login/customer" className="login-card card-animate">
-          <div className="login-icon icon-bounce">👤</div>
-          <h3>Customer Login</h3>
-          <p>For shopping and tracking your orders</p>
+        {/* CUSTOMER */}
+        <Link to="/login/customer" className="login-card">
+          <div className="login-icon">👤</div>
+          <h3>Customer</h3>
+          <p>Browse products, add to cart & track orders</p>
         </Link>
 
-        {/* RETAILER LOGIN */}
-        <Link to="/login/retailer" className="login-card card-animate">
-          <div className="login-icon icon-bounce">🛍️</div>
-          <h3>Retailer Login</h3>
+        {/* RETAILER */}
+        <Link to="/login/retailer" className="login-card">
+          <div className="login-icon">🛍️</div>
+          <h3>Retailer</h3>
           <p>Manage products, inventory & sales</p>
         </Link>
 

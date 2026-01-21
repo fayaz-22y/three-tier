@@ -1,7 +1,9 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState } from "react";
 
 import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Public Pages
 import Home from "./pages/Home";
@@ -15,35 +17,75 @@ import LoginSelect from "./pages/LoginSelect";
 import Login from "./pages/Login";
 import CustomerSignup from "./pages/CustomerSignup";
 import RetailerSignup from "./pages/RetailerSignup";
-import RetailerDashboard from "./pages/RetailerDashboard";
 
+// Dashboards
+import RetailerDashboard from "./pages/RetailerDashboard";
+import CustomerOrders from "./pages/CustomerOrders";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
+  const [search, setSearch] = useState("");
+
   return (
     <Router>
-      <Navbar />
+      {/* Navbar always visible */}
+      <Navbar onSearch={setSearch} />
 
       <div className="container">
         <Routes>
-          {/* Public Routes */}
+          {/* ===== PUBLIC ===== */}
           <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/cart" element={<Cart />} />
           <Route path="/about" element={<About />} />
 
-          {/* Login Selection */}
-          <Route path="/login" element={<LoginSelect />} />
+          {/* ===== CUSTOMER ===== */}
+          <Route path="/products" element={<Products search={search} />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
 
-          {/* Login based on role */}
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute allowedRoles={["customer"]}>
+                <Cart />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/my-orders"
+            element={
+              <ProtectedRoute allowedRoles={["customer"]}>
+                <CustomerOrders />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ===== LOGIN / SIGNUP ===== */}
+          <Route path="/login" element={<LoginSelect />} />
           <Route path="/login/customer" element={<Login role="customer" />} />
           <Route path="/login/retailer" element={<Login role="retailer" />} />
 
-          {/* Signup based on role */}
           <Route path="/signup/customer" element={<CustomerSignup />} />
           <Route path="/signup/retailer" element={<RetailerSignup />} />
-	  <Route path="/retailer/dashboard" element={<RetailerDashboard />} />
 
+          {/* ===== RETAILER ===== */}
+          <Route
+            path="/retailer/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["retailer"]}>
+                <RetailerDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ===== ADMIN ===== */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </div>
     </Router>

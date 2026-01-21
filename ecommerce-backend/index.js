@@ -1,13 +1,13 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import products from "./routes/products.js";
 import path from "path";
 import { fileURLToPath } from "url";
+
 import authRoutes from "./routes/authRoutes.js";
+import products from "./routes/products.js";
 import ordersRoutes from "./routes/orders.js";
-
-
+import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 
@@ -21,23 +21,22 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use(express.json());
 
 // Fix for __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve uploads folder (IMPORTANT)
+// Serve uploads folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.options("*", cors());
 
-
 // Routes
-app.use("/api/products", products);
 app.use("/api/auth", authRoutes);
-app.use("/api/orders", ordersRoutes);
-
-
+app.use("/api/products", products);
+app.use("/api/orders", ordersRoutes);   // ✅ FIXED
+app.use("/api/admin", adminRoutes);
 
 // Default route
 app.get("/", (req, res) => {

@@ -1,50 +1,103 @@
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
-import "./../style.css";
-import { CartContext } from "../context/CartContext";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "../style.css";
 
 function Navbar() {
-  const { totalQty } = useContext(CartContext);
+  const navigate = useNavigate();
+  const [role, setRole] = useState(null);
+
+  const syncAuth = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setRole(null);
+      return;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      setRole(payload.role);
+    } catch {
+      setRole(null);
+    }
+  };
+
+  useEffect(() => {
+    // initial load
+    syncAuth();
+
+    // listen to login/logout changes
+    window.addEventListener("authChanged", syncAuth);
+    window.addEventListener("storage", syncAuth);
+
+    return () => {
+      window.removeEventListener("authChanged", syncAuth);
+      window.removeEventListener("storage", syncAuth);
+    };
+  }, []);
+
+  const logout = () => {
+    localStorage.clear();
+
+    // 🔥 notify navbar immediately
+    window.dispatchEvent(new Event("authChanged"));
+
+    navigate("/login");
+  };
 
   return (
-    <nav className="navbar navbar-expand-lg custom-navbar shadow-sm">
-      <div className="container">
-        <Link className="navbar-brand brand-text" to="/">
-          Flozz Store
-        </Link>
+    <nav className="navbar">
+      <div className="nav-container">
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+        {/* LEFT */}
+        <div className="nav-left">
+          <Link to="/" className="logo">MyStore</Link>
 
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto align-items-center">
+          {/* Guest */}
+          {!role && (
+            <>
+              <Link to="/products">Products</Link>
+              <Link to="/about">About</Link>
+            </>
+          )}
 
-            <li className="nav-item">
-              <Link className="nav-link" to="/products">Products</Link>
-            </li>
+          {/* Customer */}
+          {role === "customer" && (
+            <>
+              <Link to="/products">Products</Link>
+              <Link to="/about">About</Link>
+            </>
+          )}
 
-            <li className="nav-item">
-              <Link className="nav-link" to="/about">About</Link>
-            </li>
+          {/* Retailer */}
+          {role === "retailer" && (
+            <Link to="/retailer/dashboard">Retailer Dashboard</Link>
+          )}
 
-            {/* CART ICON WITH BADGE */}
-            <li className="nav-item cart-icon">
-              <Link className="nav-link cart-link" to="/cart">
-                🛒 Cart
-                {totalQty > 0 && (
-                  <span className="cart-badge">{totalQty}</span>
-                )}
-              </Link>
-            </li>
+          {/* Admin */}
+          {role === "admin" && (
+            <Link to="/admin/dashboard">Admin Dashboard</Link>
+          )}
+        </div>
 
-            <Link to="/login" className="btn login-btn">Login</Link>
-          </ul>
+        {/* RIGHT */}
+        <div className="nav-right">
+
+          {!role && (
+            <Link className="btn-login" to="/login">Login</Link>
+          )}
+
+          {role === "customer" && (
+            <>
+              <Link to="/cart">Cart</Link>
+              <Link to="/my-orders">My Orders</Link>
+              <button className="btn-logout" onClick={logout}>Logout</button>
+            </>
+          )}
+
+          {(role === "retailer" || role === "admin") && (
+            <button className="btn-logout" onClick={logout}>Logout</button>
+          )}
+
         </div>
       </div>
     </nav>

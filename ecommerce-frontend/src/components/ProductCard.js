@@ -6,34 +6,31 @@ import "./../style.css";
 function ProductCard({ product }) {
   const { addToCart } = useContext(CartContext);
 
-  // Backend already sends: /uploads/filename.jpg
   const imageSrc = product.image_url || "/no-image.png";
 
   return (
-    <div className="modern-card fade-in">
-      <img
-        src={imageSrc}
-        alt={product.name}
-        className="modern-card-img"
-        onError={(e) => {
-          e.target.onerror = null;
-          e.target.src = "/no-image.png";
-        }}
-      />
+    <div className="product-card">
+      <div className="product-img-box">
+        <img
+          src={imageSrc}
+          alt={product.name}
+          onError={(e) => (e.target.src = "/no-image.png")}
+        />
+      </div>
 
-      <h4 className="modern-card-title">{product.name}</h4>
-      <p className="modern-card-price">₹{product.price}</p>
+      <div className="product-info">
+        <h4>{product.name}</h4>
+        <p className="price">₹{product.price}</p>
 
-      <Link to={`/product/${product.id}`} className="btn modern-view-btn">
-        View Product
-      </Link>
-
-      <button
-        className="btn modern-add-btn"
-        onClick={() => addToCart(product)}
-      >
-        Add to Cart
-      </button>
+        <div className="product-actions">
+          <Link to={`/product/${product.id}`} className="btn-outline">
+            View
+          </Link>
+          <button className="btn-primary" onClick={() => addToCart(product)}>
+            Add
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
